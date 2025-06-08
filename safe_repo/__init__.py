@@ -1,13 +1,10 @@
-#safe_repo
-
+# safe_repo
 
 import asyncio
 import logging
-from pyromod import listen
 from pyrogram import Client
-from config import API_ID, API_HASH, BOT_TOKEN
 from telethon.sync import TelegramClient
-
+from config import API_ID, API_HASH, BOT_TOKEN
 
 loop = asyncio.get_event_loop()
 
@@ -16,8 +13,10 @@ logging.basicConfig(
     level=logging.INFO,
 )
 
+# Initialize Telethon client
 sex = TelegramClient('sexrepo', API_ID, API_HASH).start(bot_token=BOT_TOKEN)
 
+# Initialize Pyrogram client
 app = Client(
     ":RestrictBot:",
     api_id=API_ID,
@@ -28,20 +27,25 @@ app = Client(
     max_concurrent_transmissions=5
 )
 
-
-
 async def restrict_bot():
     global BOT_ID, BOT_NAME, BOT_USERNAME
     await app.start()
-    getme = await app.get_me()
-    BOT_ID = getme.id
-    BOT_USERNAME = getme.username
-    if getme.last_name:
-        BOT_NAME = getme.first_name + " " + getme.last_name
-    else:
-        BOT_NAME = getme.first_name
+    try:
+        getme = await app.get_me()
+        BOT_ID = getme.id
+        BOT_USERNAME = getme.username
+        BOT_NAME = f"{getme.first_name} {getme.last_name}" if getme.last_name else getme.first_name
+    except Exception as e:
+        logging.error(f"Failed to retrieve bot information: {e}")
+        raise
+    finally:
+        await app.stop()
 
-
-loop.run_until_complete(restrict_bot())
-
-
+# Run the restrict_bot function
+if __name__ == "__main__":
+    try:
+        loop.run_until_complete(restrict_bot())
+    except KeyboardInterrupt:
+        logging.info("Bot initialization interrupted by user")
+    except Exception as e:
+        logging.error(f"Error during bot initialization: {e}")
