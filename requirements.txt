@@ -1,6 +1,5 @@
 pyrogram
 tgcrypto
-pyromod
 opencv-python-headless
 requests
 motor
